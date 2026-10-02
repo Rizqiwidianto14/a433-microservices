@@ -1,0 +1,32 @@
+# Gunakan format Docker Compose versi 3 (memenuhi syarat versi 2 atau lebih)
+version: '3.8'
+
+services:
+  # Service database MongoDB
+  item-db:
+    # Gunakan image mongo versi 3 dari Docker Hub
+    image: mongo:3
+    # mongo:3 hanya tersedia untuk arsitektur amd64, jadi tetapkan platformnya
+    platform: linux/amd64
+    # Simpan data MongoDB di volume app-db agar tidak hilang saat container dihapus
+    volumes:
+      - app-db:/data/db
+    # Selalu restart container jika berhenti
+    restart: always
+
+  # Service aplikasi web Node.js
+  item-app:
+    # Gunakan image item-app dari GitHub Packages
+    image: ghcr.io/rizqiwidianto14/item-app:v1
+    # Petakan port 80 di host ke port 8080 di container
+    ports:
+      - "80:8080"
+    # Jalankan item-app hanya setelah item-db diluncurkan
+    depends_on:
+      - item-db
+    # Selalu restart container jika berhenti
+    restart: always
+
+# Deklarasi volume bernama app-db untuk menyimpan data database
+volumes:
+  app-db:
