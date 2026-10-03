@@ -1,0 +1,48 @@
+# Versi API untuk Deployment
+apiVersion: apps/v1
+# Deployment untuk aplikasi backend yang stateless
+kind: Deployment
+metadata:
+  # Nama Deployment backend
+  name: karsajobs
+spec:
+  # Jumlah pod backend
+  replicas: 1
+  # Pilih pod berdasarkan label app: karsajobs
+  selector:
+    matchLabels:
+      app: karsajobs
+  template:
+    metadata:
+      labels:
+        app: karsajobs
+    spec:
+      containers:
+        # Container backend Go
+        - name: karsajobs
+          # Image backend dari GitHub Packages
+          image: ghcr.io/rizqiwidianto14/karsajobs:latest
+          # Gunakan image yang sudah ada di node bila tersedia
+          imagePullPolicy: IfNotPresent
+          ports:
+            # Port aplikasi backend
+            - containerPort: 8080
+          env:
+            # Port yang digunakan aplikasi backend
+            - name: APP_PORT
+              value: "8080"
+            # Host MongoDB, yaitu nama MongoDB Service
+            - name: MONGO_HOST
+              value: mongo-service
+            # Username MongoDB dari Secret
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_ROOT_USERNAME
+            # Password MongoDB dari Secret
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_ROOT_PASSWORD

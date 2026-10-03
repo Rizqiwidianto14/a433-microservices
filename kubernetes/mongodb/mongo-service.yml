@@ -1,0 +1,17 @@
+# Versi API untuk Service
+apiVersion: v1
+# Jenis object: Service untuk mengekspos MongoDB di dalam cluster
+kind: Service
+metadata:
+  # Nama Service; dipakai backend sebagai MONGO_HOST
+  name: mongo-service
+spec:
+  # Headless Service agar setiap pod StatefulSet punya alamat DNS stabil
+  clusterIP: None
+  # Teruskan trafik ke pod berlabel app: mongo
+  selector:
+    app: mongo
+  ports:
+    # Port Service dan port container MongoDB
+    - port: 27017
+      targetPort: 27017

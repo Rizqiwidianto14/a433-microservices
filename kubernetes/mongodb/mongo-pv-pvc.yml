@@ -1,0 +1,37 @@
+# Versi API untuk PersistentVolume
+apiVersion: v1
+# PersistentVolume: ruang penyimpanan fisik di node minikube
+kind: PersistentVolume
+metadata:
+  # Nama PersistentVolume
+  name: mongo-pv
+spec:
+  # Kapasitas penyimpanan yang disediakan
+  capacity:
+    storage: 1Gi
+  # Volume hanya bisa di-mount read-write oleh satu node
+  accessModes:
+    - ReadWriteOnce
+  # Kelas penyimpanan manual agar PV dan PVC saling terhubung
+  storageClassName: manual
+  # Simpan data di direktori /data/mongo pada node minikube
+  hostPath:
+    path: /data/mongo
+---
+# Versi API untuk PersistentVolumeClaim
+apiVersion: v1
+# PersistentVolumeClaim: permintaan penyimpanan dari pod ke PersistentVolume
+kind: PersistentVolumeClaim
+metadata:
+  # Nama PVC yang direferensikan oleh StatefulSet
+  name: mongo-pvc
+spec:
+  # Harus sama dengan storageClassName pada PV
+  storageClassName: manual
+  # Mode akses sama dengan PV
+  accessModes:
+    - ReadWriteOnce
+  # Besar penyimpanan yang diminta
+  resources:
+    requests:
+      storage: 1Gi

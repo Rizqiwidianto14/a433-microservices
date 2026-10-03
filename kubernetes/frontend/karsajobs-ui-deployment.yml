@@ -1,0 +1,29 @@
+# Versi API untuk Deployment
+apiVersion: apps/v1
+# Deployment untuk aplikasi frontend
+kind: Deployment
+metadata:
+  # Nama Deployment frontend
+  name: karsajobs-ui
+spec:
+  # Jumlah pod frontend
+  replicas: 1
+  # Pilih pod berdasarkan label app: karsajobs-ui
+  selector:
+    matchLabels:
+      app: karsajobs-ui
+  template:
+    metadata:
+      labels:
+        app: karsajobs-ui
+    spec:
+      containers:
+        # Container frontend Vue.js
+        - name: karsajobs-ui
+          # Image frontend dari GitHub Packages
+          image: ghcr.io/rizqiwidianto14/karsajobs-ui:latest
+          # Gunakan image yang sudah ada di node bila tersedia
+          imagePullPolicy: IfNotPresent
+          ports:
+            # Port aplikasi frontend
+            - containerPort: 8000

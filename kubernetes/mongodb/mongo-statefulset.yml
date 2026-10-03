@@ -1,0 +1,61 @@
+# Versi API untuk StatefulSet
+apiVersion: apps/v1
+# StatefulSet cocok untuk aplikasi stateful seperti database
+kind: StatefulSet
+metadata:
+  # Nama StatefulSet MongoDB
+  name: mongo
+spec:
+  # Service yang mengatur identitas jaringan pod
+  serviceName: mongo-service
+  # Jumlah pod MongoDB
+  replicas: 1
+  # Pilih pod berdasarkan label app: mongo
+  selector:
+    matchLabels:
+      app: mongo
+  # Template pod MongoDB
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        # Container MongoDB
+        - name: mongo
+          # Image MongoDB versi 4.4
+          image: mongo:4.4
+          ports:
+            # Port default MongoDB
+            - containerPort: 27017
+          env:
+            # Ambil username root dari file Secret yang di-mount
+            - name: MONGO_INITDB_ROOT_USERNAME_FILE
+              value: /etc/mongo-credentials/MONGO_ROOT_USERNAME
+            # Ambil password root dari file Secret yang di-mount
+            - name: MONGO_INITDB_ROOT_PASSWORD_FILE
+              value: /etc/mongo-credentials/MONGO_ROOT_PASSWORD
+          volumeMounts:
+            # Persistent Volume untuk data database
+            - name: mongo-data
+              mountPath: /data/db
+            # ConfigMap berisi mongo.conf
+            - name: mongo-config
+              mountPath: /config
+            # Secret berisi kredensial MongoDB
+            - name: mongo-credentials
+              mountPath: /etc/mongo-credentials
+              readOnly: true
+      volumes:
+        # Volume dari PersistentVolumeClaim
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+        # Volume dari ConfigMap
+        - name: mongo-config
+          configMap:
+            name: mongo-config
+        # Volume dari Secret
+        - name: mongo-credentials
+          secret:
+            secretName: mongo-secret

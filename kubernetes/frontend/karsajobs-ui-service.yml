@@ -1,0 +1,18 @@
+# Versi API untuk Service
+apiVersion: v1
+# Service untuk mengekspos frontend
+kind: Service
+metadata:
+  # Nama Service frontend
+  name: karsajobs-ui
+spec:
+  # NodePort agar frontend bisa dibuka dari browser
+  type: NodePort
+  # Teruskan trafik ke pod berlabel app: karsajobs-ui
+  selector:
+    app: karsajobs-ui
+  ports:
+    # port: port Service; targetPort: port container; nodePort: port di node
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30000

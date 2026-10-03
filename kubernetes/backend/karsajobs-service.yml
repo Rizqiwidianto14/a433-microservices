@@ -1,0 +1,18 @@
+# Versi API untuk Service
+apiVersion: v1
+# Service untuk mengekspos backend
+kind: Service
+metadata:
+  # Nama Service backend
+  name: karsajobs
+spec:
+  # NodePort agar backend bisa diakses dari luar cluster (oleh browser)
+  type: NodePort
+  # Teruskan trafik ke pod berlabel app: karsajobs
+  selector:
+    app: karsajobs
+  ports:
+    # port: port Service; targetPort: port container; nodePort: port di node
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30001

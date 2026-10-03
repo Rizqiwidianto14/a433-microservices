@@ -1,0 +1,2 @@
+Backend : https://github.com/users/rizqiwidianto14/packages/container/package/karsajobs
+Frontend: https://github.com/users/rizqiwidianto14/packages/container/package/karsajobs-ui

@@ -1,0 +1,13 @@
+# Versi API untuk object ConfigMap
+apiVersion: v1
+# Jenis object: ConfigMap untuk menyimpan konfigurasi non-rahasia
+kind: ConfigMap
+metadata:
+  # Nama ConfigMap yang akan direferensikan oleh StatefulSet
+  name: mongo-config
+data:
+  # Konfigurasi MongoDB disimpan sebagai file mongo.conf
+  mongo.conf: |
+    storage:
+      # Lokasi penyimpanan data MongoDB di dalam container
+      dbPath: /data/db
