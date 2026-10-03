@@ -1,0 +1,44 @@
+# Versi konfigurasi CircleCI
+version: 2.1
+
+jobs:
+  # Job 1: install hadolint dan lint Dockerfile
+  lint-dockerfile:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      # Ambil source code dari repository
+      - checkout
+      # Download hadolint dan jadikan executable
+      - run:
+          name: Install hadolint
+          command: |
+            sudo wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
+            sudo chmod +x /usr/local/bin/hadolint
+      # Jalankan hadolint; hanya gagal jika ada pelanggaran level error
+      - run:
+          name: Lint Dockerfile
+          command: hadolint --failure-threshold error Dockerfile
+
+  # Job 2: build dan push image ke GitHub Packages
+  build-app-karsajobs-ui:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      # Siapkan Docker engine agar bisa menjalankan docker build
+      - setup_remote_docker
+      - run:
+          name: Build and push image
+          command: |
+            chmod +x build_push_image_karsajobs_ui.sh
+            ./build_push_image_karsajobs_ui.sh
+
+workflows:
+  # Urutan: lint, lalu build
+  lint-and-build-karsajobs-ui:
+    jobs:
+      - lint-dockerfile
+      - build-app-karsajobs-ui:
+          requires:
+            - lint-dockerfile
