@@ -1,0 +1,28 @@
+# Versi API Istio untuk object VirtualService
+apiVersion: networking.istio.io/v1beta1
+# VirtualService: aturan routing trafik yang masuk melalui Gateway
+kind: VirtualService
+metadata:
+  # Nama VirtualService
+  name: order-service
+  # Namespace tempat VirtualService dibuat
+  namespace: ecommerce
+spec:
+  # Berlaku untuk request dari host mana pun
+  hosts:
+    - "*"
+  # Kaitkan dengan Gateway yang dibuat sebelumnya
+  gateways:
+    - ecommerce-gateway
+  http:
+    # Aturan routing HTTP
+    - match:
+        # Hanya cocok jika path persis /order
+        - uri:
+            exact: /order
+      route:
+        # Teruskan request ke Kubernetes Service order-service pada port 3000
+        - destination:
+            host: order-service
+            port:
+              number: 3000

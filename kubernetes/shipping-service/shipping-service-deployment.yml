@@ -1,0 +1,46 @@
+# Versi API untuk object Deployment
+apiVersion: apps/v1
+# Deployment untuk aplikasi stateless shipping-service (mengambil order dari queue RabbitMQ lalu mencetaknya)
+kind: Deployment
+metadata:
+  # Nama Deployment
+  name: shipping-service
+  # Namespace tempat Deployment dibuat
+  namespace: ecommerce
+  labels:
+    # Label penanda aplikasi
+    app: shipping-service
+spec:
+  # Jumlah pod
+  replicas: 1
+  # Pilih pod berdasarkan label app: shipping-service
+  selector:
+    matchLabels:
+      app: shipping-service
+  # Template pod
+  template:
+    metadata:
+      labels:
+        # Label pod; harus sama dengan selector
+        app: shipping-service
+        # Label versi, dipakai Istio untuk telemetry dan routing
+        version: v1
+    spec:
+      containers:
+        # Container shipping-service
+        - name: shipping-service
+          # Image dari GitHub Packages (bukan local image)
+          image: ghcr.io/rizqiwidianto14/shipping-service:latest
+          # Selalu tarik image dari registry, membuktikan image tidak berasal dari lokal
+          imagePullPolicy: Always
+          ports:
+            # Port HTTP aplikasi
+            - name: http
+              containerPort: 3001
+          env:
+            # Port HTTP aplikasi (sama dengan nilai di .env)
+            - name: PORT
+              value: "3001"
+            # Alamat RabbitMQ berdasarkan nama Kubernetes Service "rabbitmq" di namespace yang sama
+            - name: AMQP_URL
+              value: "amqp://rabbitmq:5672"

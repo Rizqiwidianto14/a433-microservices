@@ -1,0 +1,23 @@
+# Versi API untuk object Service
+apiVersion: v1
+# Jenis object: Service untuk mengekspos shipping-service di dalam cluster
+kind: Service
+metadata:
+  # Nama Service shipping-service
+  name: shipping-service
+  # Namespace tempat Service dibuat
+  namespace: ecommerce
+  labels:
+    # Label penanda aplikasi
+    app: shipping-service
+spec:
+  # ClusterIP: hanya bisa diakses dari dalam cluster (akses luar lewat Istio Ingress Gateway)
+  type: ClusterIP
+  # Teruskan trafik ke pod berlabel app: shipping-service
+  selector:
+    app: shipping-service
+  ports:
+    # Port HTTP; prefix "http" memberi tahu Istio bahwa protokolnya HTTP
+    - name: http
+      port: 3001
+      targetPort: 3001

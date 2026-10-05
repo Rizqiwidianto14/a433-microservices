@@ -1,0 +1,10 @@
+# Versi API untuk object Namespace
+apiVersion: v1
+# Jenis object: Namespace untuk mengelompokkan semua resource E-Commerce App
+kind: Namespace
+metadata:
+  # Nama namespace
+  name: ecommerce
+  labels:
+    # Aktifkan injeksi Istio sidecar (Envoy) otomatis untuk setiap pod di namespace ini
+    istio-injection: enabled
