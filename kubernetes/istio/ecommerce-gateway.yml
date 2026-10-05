@@ -1,0 +1,22 @@
+# Versi API Istio untuk object Gateway
+apiVersion: networking.istio.io/v1beta1
+# Gateway: pintu masuk trafik dari luar cluster ke dalam service mesh
+kind: Gateway
+metadata:
+  # Nama Gateway; dirujuk oleh VirtualService
+  name: ecommerce-gateway
+  # Namespace tempat Gateway dibuat
+  namespace: ecommerce
+spec:
+  # Gunakan Istio Ingress Gateway bawaan (pod berlabel istio: ingressgateway)
+  selector:
+    istio: ingressgateway
+  servers:
+    # Terima trafik HTTP di port 80
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      # Terima request dari host mana pun
+      hosts:
+        - "*"

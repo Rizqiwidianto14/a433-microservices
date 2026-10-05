@@ -1,0 +1,66 @@
+# Versi API untuk object StatefulSet
+apiVersion: apps/v1
+# StatefulSet dipakai karena RabbitMQ menyimpan data (stateful) dan butuh identitas pod yang stabil
+kind: StatefulSet
+metadata:
+  # Nama StatefulSet
+  name: rabbitmq
+  # Namespace tempat StatefulSet dibuat
+  namespace: ecommerce
+spec:
+  # Service yang mengatur identitas jaringan pod StatefulSet
+  serviceName: rabbitmq
+  # Jumlah pod RabbitMQ
+  replicas: 1
+  # Pilih pod berdasarkan label app: rabbitmq
+  selector:
+    matchLabels:
+      app: rabbitmq
+  # Template pod RabbitMQ
+  template:
+    metadata:
+      labels:
+        # Label pod; harus sama dengan selector
+        app: rabbitmq
+        # RabbitMQ adalah infrastruktur message broker, bukan bagian aplikasi, jadi tidak diberi Istio sidecar
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        # Container RabbitMQ server
+        - name: rabbitmq
+          # Image RabbitMQ 3.11 dengan plugin management dari Docker Hub
+          image: rabbitmq:3.11-management
+          ports:
+            # Port AMQP
+            - name: amqp
+              containerPort: 5672
+            # Port dashboard management
+            - name: management
+              containerPort: 15672
+          # Pod baru dianggap siap setelah RabbitMQ merespons ping
+          readinessProbe:
+            exec:
+              # Perintah bawaan RabbitMQ untuk cek kesehatan node
+              command: ["rabbitmq-diagnostics", "-q", "ping"]
+            # Tunggu 20 detik sebelum pengecekan pertama
+            initialDelaySeconds: 20
+            # Cek setiap 10 detik
+            periodSeconds: 10
+            # Batas waktu setiap pengecekan
+            timeoutSeconds: 10
+          volumeMounts:
+            # Simpan data RabbitMQ (queue, pesan) di persistent volume
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
+  # Buat PersistentVolumeClaim otomatis untuk setiap pod
+  volumeClaimTemplates:
+    - metadata:
+        # Nama volume; dirujuk oleh volumeMounts di atas
+        name: rabbitmq-data
+      spec:
+        # Volume hanya bisa di-mount read-write oleh satu node
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            # Kapasitas penyimpanan yang diminta
+            storage: 1Gi

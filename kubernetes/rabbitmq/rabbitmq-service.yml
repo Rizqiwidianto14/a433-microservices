@@ -1,0 +1,25 @@
+# Versi API untuk object Service
+apiVersion: v1
+# Jenis object: Service agar RabbitMQ bisa diakses service lain di dalam cluster
+kind: Service
+metadata:
+  # Nama Service; dipakai di AMQP_URL (amqp://rabbitmq:5672)
+  name: rabbitmq
+  # Namespace tempat Service dibuat
+  namespace: ecommerce
+  labels:
+    # Label penanda aplikasi
+    app: rabbitmq
+spec:
+  # Teruskan trafik ke pod berlabel app: rabbitmq
+  selector:
+    app: rabbitmq
+  ports:
+    # Port AMQP untuk komunikasi order service dan shipping service; prefix "tcp-" memberi tahu Istio protokolnya
+    - name: tcp-amqp
+      port: 5672
+      targetPort: 5672
+    # Port dashboard RabbitMQ Management; prefix "http-" memberi tahu Istio protokolnya
+    - name: http-management
+      port: 15672
+      targetPort: 15672

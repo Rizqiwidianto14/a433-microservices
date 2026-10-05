@@ -1,0 +1,23 @@
+# Versi API untuk object Service
+apiVersion: v1
+# Jenis object: Service untuk mengekspos order-service di dalam cluster
+kind: Service
+metadata:
+  # Nama Service order-service
+  name: order-service
+  # Namespace tempat Service dibuat
+  namespace: ecommerce
+  labels:
+    # Label penanda aplikasi
+    app: order-service
+spec:
+  # ClusterIP: hanya bisa diakses dari dalam cluster (akses luar lewat Istio Ingress Gateway)
+  type: ClusterIP
+  # Teruskan trafik ke pod berlabel app: order-service
+  selector:
+    app: order-service
+  ports:
+    # Port HTTP; prefix "http" memberi tahu Istio bahwa protokolnya HTTP
+    - name: http
+      port: 3000
+      targetPort: 3000
